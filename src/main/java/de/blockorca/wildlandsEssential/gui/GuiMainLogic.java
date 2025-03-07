@@ -12,102 +12,61 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiMainLogic implements GuiMenu{
+public class GuiMainLogic implements GuiMenu {
 
     Main main;
     Player player;
 
-    public GuiMainLogic(Main main,Player player) {
-
-            this.main = main;
-            this.player = player;
-
-
-
-
-
+    public GuiMainLogic(Main main, Player player) {
+        this.main = main;
+        this.player = player;
     }
 
+    @Override
     public void openMenu() {
-
         player.openInventory(createMenu());
     }
 
-
-
+    @Override
     public Inventory createMenu() {
-
-
-        // Erzeugen des Economy Items mit Namen und lore
-        ItemStack economy = new ItemStack(Material.GOLD_INGOT);
-        ItemMeta economyMeta = economy.getItemMeta();
-        List<String> economyLore = new ArrayList<>();
-        economyLore.add(ChatColor.GREEN + "Hier kommst du zur bank ");
-        economyMeta.setDisplayName(ChatColor.GOLD + "Economy");
-        economyMeta.setLore(economyLore);
-        economy.setItemMeta(economyMeta);
-
-
-        // Erzeugen des Warps Items mit Namen und lore
-        ItemStack warps = new ItemStack(Material.ENDER_PEARL);
-        ItemMeta warpsMeta = warps.getItemMeta();
-        List<String> warpsLore = new ArrayList<>();
-        warpsLore.add(ChatColor.GREEN + "Hier kommst du zu den Warps ");
-        warpsMeta.setDisplayName(ChatColor.GOLD + "Warps");
-        warpsMeta.setLore(warpsLore);
-        warps.setItemMeta(warpsMeta);
-
-        // Erzeugen des DeadChest Items mit Namen und lore
-        ItemStack deadChest = new ItemStack(Material.CHEST);
-        ItemMeta deadChestMeta = deadChest.getItemMeta();
-        List<String> deadChestLore = new ArrayList<>();
-        deadChestLore.add(ChatColor.GREEN + "Hier kommst du zur DeadChest ");
-        deadChestMeta.setDisplayName(ChatColor.GOLD + "Dead Chest");
-        deadChestMeta.setLore(deadChestLore);
-        deadChest.setItemMeta(deadChestMeta);
-
-        // Erzeugen des buyable Functions Items mit Namen und lore
-        ItemStack buyableFunctions = new ItemStack(Material.NETHER_STAR);
-        ItemMeta buyableFunctionsMeta = buyableFunctions.getItemMeta();
-        List<String> buyableFunctionsLore = new ArrayList<>();
-        buyableFunctionsLore.add(ChatColor.GREEN + "Hier kommst du zu den BuyableFunctions");
-        buyableFunctionsMeta.setDisplayName(ChatColor.GOLD + "Buyable Functions");
-        buyableFunctionsMeta.setLore(buyableFunctionsLore);
-        buyableFunctions.setItemMeta(buyableFunctionsMeta);
-
-
-        ItemStack background = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-
-
-        //Indexe von den Menü Items holen
-        int economyindex = main.getConfig().getInt("EconomyItem.position");
-        int warpindex = main.getConfig().getInt("WarpItem.position");
-        int deadchestindex = main.getConfig().getInt("DeadChestItem.position");
-        int buyablefunctionsindex = main.getConfig().getInt("BuyableFunctionItem.position");
-
-
-        // Erzeugen des Inventars und Items darin platzieren
-
-
         Inventory mainMenu = Bukkit.createInventory(null, 45, "Main Menu");
+
+        // Menü-Items erstellen
+        ItemStack economy = createMenuItem("Economy", Material.GOLD_INGOT, "Hier kommst du zur Bank");
+        ItemStack warps = createMenuItem("Warps", Material.ENDER_PEARL, "Hier kommst du zu den Warps");
+        ItemStack deadChest = createMenuItem("Dead Chest", Material.CHEST, "Hier kommst du zur DeadChest");
+        ItemStack buyableFunctions = createMenuItem("Buyable Functions", Material.NETHER_STAR, "Hier kommst du zu den BuyableFunctions");
+
+        // Indexe aus der Config oder Standardwerte
+        int economyindex = main.getConfig().getInt("EconomyItem.position", 20);
+        int warpindex = main.getConfig().getInt("WarpItem.position", 21);
+        int deadchestindex = main.getConfig().getInt("DeadChestItem.position", 22);
+        int buyablefunctionsindex = main.getConfig().getInt("BuyableFunctionItem.position", 23);
+
+        // Items ins Menü setzen
         mainMenu.setItem(economyindex, economy);
         mainMenu.setItem(warpindex, warps);
         mainMenu.setItem(deadchestindex, deadChest);
         mainMenu.setItem(buyablefunctionsindex, buyableFunctions);
 
-        for (int i = 0;i<45;i++){
-
-            if (!(i ==20 || i==21 || i==22 || i==23 || i==24)){
+        // Hintergrund setzen
+        ItemStack background = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+        for (int i = 0; i < 45; i++) {
+            if (!(i == economyindex || i == warpindex || i == deadchestindex || i == buyablefunctionsindex)) {
                 mainMenu.setItem(i, background);
-
             }
         }
-
         return mainMenu;
-
     }
 
-
-
-
+    private ItemStack createMenuItem(String name, Material material, String loreText) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(ChatColor.GOLD + name);
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.GREEN + loreText);
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        return item;
+    }
 }

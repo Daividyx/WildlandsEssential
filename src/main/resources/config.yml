@@ -1,6 +1,6 @@
-#in this config you can set prices,warps,menuItem positions and so on
+# In this config you can set prices, warps, menu item positions and so on
 
-#Main Menu Item Positions
+# Main Menu Item Positions
 EconomyItem:
   position: 20
 WarpItem:
@@ -9,20 +9,41 @@ DeadChestItem:
   position: 22
 BuyableFunctionItem:
   position: 23
-#Economy Menu Item Positions
+
+# Economy Menu Item Positions
 balanceItem:
   position: 21
 infoItem:
   position: 23
-backItem:
+backItemEconomyMenu:
   position: 36
+
+# Warp Menu Item Positions
+Warp1Item:
+  position: 20
+Warp2Item:
+  position: 21
+Warp3Item:
+  position: 22
+backItemWarpMenu:
+  position: 36
+
+# DeadChest Menu Item Positions
+BuyBackItem:
+  position: 20
+InfoItem:
+  position: 21
+backItemDeadChestMenu:
+  position: 36
+
+# Buyable Menu Item Positions
+FlyItem:
+  position: 20
+SleepItem:
+  position: 21
+backItemBuyableMenu:
+  position: 36
+
 player:
   uuid:
     Balance
-
-
-
-
-
-
-

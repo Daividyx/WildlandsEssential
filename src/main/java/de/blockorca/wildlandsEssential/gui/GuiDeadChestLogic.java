@@ -12,12 +12,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiEconomyLogic implements GuiMenu {
+public class GuiDeadChestLogic implements GuiMenu {
 
     Main main;
     Player player;
 
-    public GuiEconomyLogic(Main main, Player player) {
+    public GuiDeadChestLogic(Main main, Player player) {
         this.main = main;
         this.player = player;
     }
@@ -29,31 +29,31 @@ public class GuiEconomyLogic implements GuiMenu {
 
     @Override
     public Inventory createMenu() {
-        Inventory economyMenu = Bukkit.createInventory(null, 45, "Economy Menu");
+        Inventory deadChestMenu = Bukkit.createInventory(null, 45, "DeadChest Menu");
 
-        // Menü-Items aus der Config erstellen
-        ItemStack balance = createMenuItem(main.getConfig().getString("balanceItem.name", "Kontostand"), Material.GOLD_INGOT, main.getConfig().getString("balanceItem.lore", "Dein aktueller Kontostand"));
-        ItemStack info = createMenuItem(main.getConfig().getString("infoItem.name", "Info"), Material.BOOK, main.getConfig().getString("infoItem.lore", "Hier gibt es Infos zum Economy-System"));
+        // Menü-Items erstellen
+        ItemStack buyBack = createMenuItem("Kaufen", Material.EMERALD, "Kaufe deine Items zurück");
+        ItemStack info = createMenuItem("Info", Material.BOOK, "Informationen zur DeadChest");
         ItemStack back = createBackItem();
 
         // Indexe aus der Config oder Standardwerte nutzen
-        int balanceIndex = main.getConfig().getInt("balanceItem.position", 21);
-        int infoIndex = main.getConfig().getInt("infoItem.position", 23);
-        int backIndex = main.getConfig().getInt("backItemEconomyMenu.position", 36);
+        int buyBackIndex = main.getConfig().getInt("BuyBackItem.position", 20);
+        int infoIndex = main.getConfig().getInt("InfoItem.position", 21);
+        int backIndex = main.getConfig().getInt("BackItemDeadChestMenu.position", 36);
 
         // Items ins Menü setzen
-        economyMenu.setItem(balanceIndex, balance);
-        economyMenu.setItem(infoIndex, info);
-        economyMenu.setItem(backIndex, back);
+        deadChestMenu.setItem(buyBackIndex, buyBack);
+        deadChestMenu.setItem(infoIndex, info);
+        deadChestMenu.setItem(backIndex, back);
 
         // Hintergrund setzen
         ItemStack background = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         for (int i = 0; i < 45; i++) {
-            if (!(i == balanceIndex || i == infoIndex || i == backIndex)) {
-                economyMenu.setItem(i, background);
+            if (!(i == buyBackIndex || i == infoIndex || i == backIndex)) {
+                deadChestMenu.setItem(i, background);
             }
         }
-        return economyMenu;
+        return deadChestMenu;
     }
 
     private ItemStack createMenuItem(String name, Material material, String loreText) {
