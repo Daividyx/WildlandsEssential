@@ -1,0 +1,12 @@
+#in this config you can set prices,warps,menuItem positions and so on
+
+#Main Menu Item Positions
+EconomyItem:
+  position: 20
+WarpItem:
+  position: 21
+DeadChestItem:
+  position: 22
+BuyableFunctionItem:
+  position: 23
+
