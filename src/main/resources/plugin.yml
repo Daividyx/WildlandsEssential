@@ -1,0 +1,4 @@
+name: WildlandsEssential
+version: '1.0-SNAPSHOT'
+main: de.blockorca.wildlandsEssential.WildlandsEssential
+api-version: '1.21'
