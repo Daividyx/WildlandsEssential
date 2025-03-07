@@ -83,7 +83,9 @@ public class GuiListener implements Listener {
     private void handleDeadChestMenuClick(Player player, ItemStack clickedItem) {
         if (clickedItem.getType() == Material.BARRIER) {
             new GuiMainLogic(main, player).openMenu();
-        }
+        }   else if (clickedItem.getType() == Material.EMERALD) {
+        new GuiConfirmPurchase(main, player).openMenu();
+    }
     }
 
     private void handleBuyableMenuClick(Player player, ItemStack clickedItem) {

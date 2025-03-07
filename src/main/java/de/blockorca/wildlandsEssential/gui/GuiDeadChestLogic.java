@@ -37,8 +37,8 @@ public class GuiDeadChestLogic implements GuiMenu {
         ItemStack back = createBackItem();
 
         // Indexe aus der Config oder Standardwerte nutzen
-        int buyBackIndex = main.getConfig().getInt("BuyBackItem.position", 20);
-        int infoIndex = main.getConfig().getInt("InfoItem.position", 21);
+        int buyBackIndex = main.getConfig().getInt("BuyBackItem.position");
+        int infoIndex = main.getConfig().getInt("InfoItem.position");
         int backIndex = main.getConfig().getInt("BackItemDeadChestMenu.position", 36);
 
         // Items ins Menü setzen

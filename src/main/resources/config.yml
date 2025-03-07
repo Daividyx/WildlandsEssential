@@ -2,48 +2,101 @@
 
 # Main Menu Item Positions
 EconomyItem:
+  name: "Economy"
+  lore: "Hier kommst du zur Bank"
   position: 20
 WarpItem:
+  name: "Warps"
+  lore: "Hier kommst du zu den Warps"
   position: 21
 DeadChestItem:
+  name: "Dead Chest"
+  lore: "Hier kommst du zur DeadChest"
   position: 22
 BuyableFunctionItem:
+  name: "Buyable Functions"
+  lore: "Hier kommst du zu den kaufbaren Funktionen"
   position: 23
 
 # Economy Menu Item Positions
 balanceItem:
+  name: "Kontostand"
+  lore: "Dein aktueller Kontostand"
   position: 21
+
 infoItem:
+  name: "Info"
+  lore: "Hier gibt es Infos zum Economy-System"
   position: 23
 backItemEconomyMenu:
+  name: "Zurück"
+  lore: "Zurück zum Hauptmenü"
   position: 36
 
 # Warp Menu Item Positions
 Warp1Item:
+  name: "Warp 1"
+  lore: "Teleport zu Warp 1"
   position: 20
 Warp2Item:
+  name: "Warp 2"
+  lore: "Teleport zu Warp 2"
   position: 21
 Warp3Item:
+  name: "Warp 3"
+  lore: "Teleport zu Warp 3"
   position: 22
 backItemWarpMenu:
+  name: "Zurück"
+  lore: "Zurück zum Hauptmenü"
   position: 36
 
 # DeadChest Menu Item Positions
 BuyBackItem:
-  position: 20
-InfoItem:
+  name: "Kaufen"
+  lore: "Kaufe deine Items zurück"
   position: 21
+InfoItem:
+  name: "Info"
+  lore: "Informationen zu den DeadChests"
+  position: 23
 backItemDeadChestMenu:
+  name: "Zurück"
+  lore: "Zurück zum Hauptmenü"
   position: 36
 
 # Buyable Menu Item Positions
 FlyItem:
+  name: "Fliegen kaufen"
+  lore: "Fliegen für 24h erwerben"
   position: 20
 SleepItem:
+  name: "Allein schlafen"
+  lore: "Dauerhaft allein schlafen können"
   position: 21
+BuyableItem1:
+  name: "Item 1"
+  lore: "Zusätzliches kaufbares Item 1"
+  position: 22
+BuyableItem2:
+  name: "Item 2"
+  lore: "Zusätzliches kaufbares Item 2"
+  position: 23
+BuyableItem3:
+  name: "Item 3"
+  lore: "Zusätzliches kaufbares Item 3"
+  position: 24
 backItemBuyableMenu:
+  name: "Zurück"
+  lore: "Zurück zum Hauptmenü"
   position: 36
 
-player:
-  uuid:
-    Balance
+# Confirm Purchase Menu
+ConfirmItem:
+  name: "Bestätigen"
+  lore: "Kauf abschließen"
+  position: 20
+CancelItem:
+  name: "Abbrechen"
+  lore: "Kauf abbrechen"
+  position: 24

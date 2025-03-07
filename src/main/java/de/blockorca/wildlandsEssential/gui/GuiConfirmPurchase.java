@@ -36,8 +36,8 @@ public class GuiConfirmPurchase implements GuiMenu {
         ItemStack cancel = createMenuItem("Abbrechen", Material.RED_WOOL, "Kauf abbrechen und zurück");
 
         // Indexe aus der Config oder Standardwerte nutzen
-        int confirmIndex = main.getConfig().getInt("ConfirmItem.position", 20);
-        int cancelIndex = main.getConfig().getInt("CancelItem.position", 24);
+        int confirmIndex = main.getConfig().getInt("ConfirmItem.position");
+        int cancelIndex = main.getConfig().getInt("CancelItem.position");
 
         // Items ins Menü setzen
         confirmMenu.setItem(confirmIndex, confirm);

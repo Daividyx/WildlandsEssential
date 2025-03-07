@@ -37,8 +37,8 @@ public class GuiEconomyLogic implements GuiMenu {
         ItemStack back = createBackItem();
 
         // Indexe aus der Config oder Standardwerte nutzen
-        int balanceIndex = main.getConfig().getInt("balanceItem.position", 21);
-        int infoIndex = main.getConfig().getInt("infoItem.position", 23);
+        int balanceIndex = main.getConfig().getInt("balanceItem.position");
+        int infoIndex = main.getConfig().getInt("infoItem.position");
         int backIndex = main.getConfig().getInt("backItemEconomyMenu.position", 36);
 
         // Items ins Menü setzen

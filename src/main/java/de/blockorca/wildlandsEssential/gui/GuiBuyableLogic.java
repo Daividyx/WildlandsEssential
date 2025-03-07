@@ -40,11 +40,11 @@ public class GuiBuyableLogic implements GuiMenu {
         ItemStack back = createBackItem();
 
         // Indexe aus der Config oder Standardwerte nutzen
-        int flyIndex = main.getConfig().getInt("FlyItem.position", 20);
-        int sleepIndex = main.getConfig().getInt("SleepItem.position", 21);
-        int item1Index = main.getConfig().getInt("BuyableItem1.position", 22);
-        int item2Index = main.getConfig().getInt("BuyableItem2.position", 23);
-        int item3Index = main.getConfig().getInt("BuyableItem3.position", 24);
+        int flyIndex = main.getConfig().getInt("FlyItem.position");
+        int sleepIndex = main.getConfig().getInt("SleepItem.position");
+        int item1Index = main.getConfig().getInt("BuyableItem1.position");
+        int item2Index = main.getConfig().getInt("BuyableItem2.position");
+        int item3Index = main.getConfig().getInt("BuyableItem3.position");
         int backIndex = main.getConfig().getInt("backItemBuyableMenu.position", 36);
 
         // Items ins Menü setzen
