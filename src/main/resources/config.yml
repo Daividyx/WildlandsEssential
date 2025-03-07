@@ -9,4 +9,20 @@ DeadChestItem:
   position: 22
 BuyableFunctionItem:
   position: 23
+#Economy Menu Item Positions
+balanceItem:
+  position: 21
+infoItem:
+  position: 23
+backItem:
+  position: 36
+player:
+  uuid:
+    Balance
+
+
+
+
+
+
 

@@ -8,3 +8,5 @@ commands:
   menu:
     description: Opens the Plugin's main menu
     usage: /menu
+  ecomenu:
+    description: has

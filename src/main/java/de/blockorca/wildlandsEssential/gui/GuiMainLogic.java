@@ -4,8 +4,6 @@ import de.blockorca.wildlandsEssential.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -14,21 +12,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiMainLogic {
+public class GuiMainLogic implements GuiMenu{
 
     Main main;
-    CommandSender commandSender;
-    Command command;
-    String s;
-    String[] strings;
+    Player player;
 
-    public GuiMainLogic(Main main, CommandSender commandSender, Command command, String s, String[] strings) {
+    public GuiMainLogic(Main main,Player player) {
 
             this.main = main;
-            this.commandSender = commandSender;
-            this.command = command;
-            this.s = s;
-            this.strings = strings;
+            this.player = player;
 
 
 
@@ -36,23 +28,14 @@ public class GuiMainLogic {
 
     }
 
-    public boolean isPlayer(CommandSender sender) {
+    public void openMenu() {
 
-        if(!(sender instanceof Player)){
-
-            sender.sendMessage(ChatColor.RED + "Only players can use this command!");
-            return false;
-        }
-        Player player = (Player) sender;
-        return true;
+        player.openInventory(createMenu());
     }
 
-    public void openMenu(Player player) {
 
 
-            player.openInventory(createMainMenu());
-    }
-    public Inventory createMainMenu() {
+    public Inventory createMenu() {
 
 
         // Erzeugen des Economy Items mit Namen und lore
@@ -97,10 +80,10 @@ public class GuiMainLogic {
 
 
         //Indexe von den Menü Items holen
-        int economyindex = main.getConfig().getInt("EconomyItem");
-        int warpindex = main.getConfig().getInt("WarpsItem");
-        int deadchestindex = main.getConfig().getInt("DeadChestItem");
-        int buyablefunctionsindex = main.getConfig().getInt("BuyableFunctionsItem");
+        int economyindex = main.getConfig().getInt("EconomyItem.position");
+        int warpindex = main.getConfig().getInt("WarpItem.position");
+        int deadchestindex = main.getConfig().getInt("DeadChestItem.position");
+        int buyablefunctionsindex = main.getConfig().getInt("BuyableFunctionItem.position");
 
 
         // Erzeugen des Inventars und Items darin platzieren
@@ -114,7 +97,7 @@ public class GuiMainLogic {
 
         for (int i = 0;i<45;i++){
 
-            if (!(i ==20 || i==21 || i==22 || i==23)){
+            if (!(i ==20 || i==21 || i==22 || i==23 || i==24)){
                 mainMenu.setItem(i, background);
 
             }
