@@ -1,4 +1,10 @@
 name: WildlandsEssential
-version: '1.0-SNAPSHOT'
-main: de.blockorca.wildlandsEssential.WildlandsEssential
-api-version: '1.21'
+main: de.blockorca.wildlandsEssential.Main
+version: 1.0
+api-version: 1.21
+author: Daividyx(BlockOrca)
+description: A custom, essentials-like and survival friendly plugin for Spigot servers.
+commands:
+  menu:
+    description: Opens the Plugin's main menu
+    usage: /menu
