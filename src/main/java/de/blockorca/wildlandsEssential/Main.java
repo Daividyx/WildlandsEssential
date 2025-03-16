@@ -1,13 +1,32 @@
 package de.blockorca.wildlandsEssential;
 
+import com.earth2me.essentials.Essentials;
 import de.blockorca.wildlandsEssential.listener.CommandListener;
 import de.blockorca.wildlandsEssential.listener.GuiListener;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin {
 
+    private Essentials essentials;
+
     @Override
     public void onEnable() {
+
+
+
+        // Versuche, das Plugin "Essentials" zu bekommen
+        Plugin essPlugin = getServer().getPluginManager().getPlugin("Essentials");
+        if (essPlugin instanceof Essentials) {
+            this.essentials = (Essentials) essPlugin;
+            getLogger().info("Essentials erkannt. Kann auf Essentials-API zugreifen!");
+        } else {
+            getLogger().warning("Essentials wurde nicht gefunden.");
+            // Falls du dein Plugin beenden willst, wenn Essentials fehlt:
+            // getServer().getPluginManager().disablePlugin(this);
+        }
+
+
         registerCommands();
         registerEvents();
     }
@@ -27,5 +46,10 @@ public final class Main extends JavaPlugin {
 
     public void registerEvents() {
         getServer().getPluginManager().registerEvents(new GuiListener(this), this);
+    }
+
+
+    public Essentials getEssentials() {
+        return essentials;
     }
 }

@@ -1,30 +1,33 @@
 # In this config you can set prices, warps, menu item positions and so on
 
 # Main Menu Item Positions
-EconomyItem:
+economyItem:
   name: "Economy"
   lore: "Hier kommst du zur Bank"
   position: 20
-WarpItem:
+homeItem:
+    name: "Homes"
+    lore: "Hier kommst du zu den Homes"
+    position: 21
+warpItem:
   name: "Warps"
   lore: "Hier kommst du zu den Warps"
-  position: 21
-DeadChestItem:
+  position: 22
+deadChestItem:
   name: "Dead Chest"
   lore: "Hier kommst du zur DeadChest"
-  position: 22
-BuyableFunctionItem:
-  name: "Buyable Functions"
-  lore: "Hier kommst du zu den kaufbaren Funktionen"
   position: 23
+buyableItem:
+  name: "Kaufbare Funktionen"
+  lore: "Hier kommst du zu den kaufbaren Funktionen"
+  position: 24
 
 # Economy Menu Item Positions
 balanceItem:
   name: "Kontostand"
-  lore: "Dein aktueller Kontostand"
   position: 21
 
-infoItem:
+economyInfoItem:
   name: "Info"
   lore: "Hier gibt es Infos zum Economy-System"
   position: 23
@@ -33,32 +36,67 @@ backItemEconomyMenu:
   lore: "Zurück zum Hauptmenü"
   position: 36
 
-# Warp Menu Item Positions
-Warp1Item:
-  name: "Warp 1"
-  lore: "Teleport zu Warp 1"
+# Homes item Positions
+home1:
+  name: "Home 1"
   position: 20
-Warp2Item:
-  name: "Warp 2"
-  lore: "Teleport zu Warp 2"
+  preis: 100
+home2:
+  name: "Home 2"
   position: 21
-Warp3Item:
-  name: "Warp 3"
-  lore: "Teleport zu Warp 3"
+  preis: 200
+home3:
+  name: "Home 3"
   position: 22
+  preis: 400
+home4:
+  name: "Home 4"
+  position: 23
+  preis: 800
+home5:
+  name: "Home 5"
+  position: 24
+  preis: 1600
+backItemHomeMenu:
+  name: "Zurück"
+  lore: "Zurück zum Hauptmenü"
+  position: 36
+
+
+# Warp Menu Item Positions
+warp1:
+  name: "Warp 1"
+  position: 20
+  preis: 100
+warp2:
+  name: "Warp 2"
+  position: 21
+  preis: 200
+warp3:
+  name: "Warp 3"
+  position: 22
+  preis: 400
+warp4:
+  name: "Warp 4"
+  position: 23
+  preis: 800
+warp5:
+  name: "Warp 5"
+  position: 24
+  preis: 1600
 backItemWarpMenu:
   name: "Zurück"
   lore: "Zurück zum Hauptmenü"
   position: 36
 
 # DeadChest Menu Item Positions
-BuyBackItem:
+buyItem:
   name: "Kaufen"
-  lore: "Kaufe deine Items zurück"
+  preis: 1000
   position: 21
-InfoItem:
+teleportItem:
   name: "Info"
-  lore: "Informationen zu den DeadChests"
+  preis: 5000
   position: 23
 backItemDeadChestMenu:
   name: "Zurück"
@@ -66,37 +104,116 @@ backItemDeadChestMenu:
   position: 36
 
 # Buyable Menu Item Positions
-FlyItem:
+buyableItem1:
   name: "Fliegen kaufen"
-  lore: "Fliegen für 24h erwerben"
+  preis: 1000
   position: 20
-SleepItem:
-  name: "Allein schlafen"
-  lore: "Dauerhaft allein schlafen können"
+
+buyableItem2:
+  name: "Alleine schlafen"
+  preis: 5000
   position: 21
-BuyableItem1:
+
+buyableItem3:
   name: "Item 1"
-  lore: "Zusätzliches kaufbares Item 1"
+  preis: 2500
   position: 22
-BuyableItem2:
+
+buyableItem4:
   name: "Item 2"
-  lore: "Zusätzliches kaufbares Item 2"
+  preis: 3000
   position: 23
-BuyableItem3:
+
+buyableItem5:
   name: "Item 3"
-  lore: "Zusätzliches kaufbares Item 3"
+  preis: 4000
   position: 24
+
 backItemBuyableMenu:
   name: "Zurück"
   lore: "Zurück zum Hauptmenü"
   position: 36
 
+
 # Confirm Purchase Menu
-ConfirmItem:
+confirmItem:
   name: "Bestätigen"
-  lore: "Kauf abschließen"
   position: 20
-CancelItem:
+cancelItem:
   name: "Abbrechen"
-  lore: "Kauf abbrechen"
   position: 24
+
+
+# DeadChest Datenhaltung
+deadChest:
+  players:
+    player1:
+      UUID: null
+      name: "Spieler1"
+      world: "world"
+      x: 100
+      y: 64
+      z: -200
+    player2:
+      UUID: null
+      name: "Spieler2"
+      world: "world"
+      x: 150
+      y: 70
+      z: -250
+    player3:
+      UUID: null
+      name: "Spieler3"
+      world: "world"
+      x: 200
+      y: 65
+      z: -300
+    player4:
+      UUID: null
+      name: "Spieler4"
+      world: "world"
+      x: 250
+      y: 72
+      z: -350
+    player5:
+      UUID: null
+      name: "Spieler5"
+      world: "world"
+      x: 300
+      y: 66
+      z: -400
+    player6:
+      UUID: null
+      name: "Spieler6"
+      world: "world"
+      x: 350
+      y: 68
+      z: -450
+    player7:
+      UUID: null
+      name: "Spieler7"
+      world: "world"
+      x: 400
+      y: 69
+      z: -500
+    player8:
+      UUID: null
+      name: "Spieler8"
+      world: "world"
+      x: 450
+      y: 71
+      z: -550
+    player9:
+      UUID: null
+      name: "Spieler9"
+      world: "world"
+      x: 500
+      y: 64
+      z: -600
+    player10:
+      UUID: null
+      name: "Spieler10"
+      world: "world"
+      x: 550
+      y: 73
+      z: -650

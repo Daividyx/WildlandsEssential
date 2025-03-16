@@ -28,10 +28,10 @@ public class CommandListener implements CommandExecutor {
 
         switch (command.getName().toLowerCase()) {
             case "menu":
-                menu = new GuiMainLogic(main, player);
+                menu = new GuiMainMenu(main, player);
                 break;
-            case "economy":
-                menu = new GuiEconomyLogic(main, player);
+           /* case "economy":
+                menu = new GuiEconomy(main, player);
                 break;
             case "warps":
                 menu = new GuiWarpLogic(main, player);
@@ -41,7 +41,7 @@ public class CommandListener implements CommandExecutor {
                 break;
             case "buyable":
                 menu = new GuiBuyableLogic(main, player);
-                break;
+                break;*/
         }
 
         if (menu != null) {

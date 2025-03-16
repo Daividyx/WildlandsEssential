@@ -4,6 +4,7 @@ version: 1.0
 api-version: 1.21
 author: Daividyx(BlockOrca)
 description: A custom, essentials-like and survival friendly plugin for Spigot servers.
+softdepend: [Essentials]
 commands:
   menu:
     description: Opens the Plugin's main menu
