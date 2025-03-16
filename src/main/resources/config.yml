@@ -91,7 +91,7 @@ backItemWarpMenu:
 
 # DeadChest Menu Item Positions
 buyItem:
-  name: "Kaufen"
+  name: "DeadChest Kaufen"
   preis: 1000
   position: 21
 teleportItem:
@@ -142,6 +142,7 @@ confirmItem:
 cancelItem:
   name: "Abbrechen"
   position: 24
+
 
 
 # DeadChest Datenhaltung

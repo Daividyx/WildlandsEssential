@@ -24,7 +24,7 @@ public class GuiDeadChest extends AbstractMenu {
 
         // Kaufen-Item
         int buyIndex = main.getConfig().getInt("buyItem.position");
-        String buyName = main.getConfig().getString("buyItem.name", "Kaufen");
+        String buyName = main.getConfig().getString("buyItem.name");
         int buyPrice = main.getConfig().getInt("buyItem.preis");
         ItemStack buyItem = createMenuItem(
                 ChatColor.GOLD + buyName,
@@ -40,7 +40,7 @@ public class GuiDeadChest extends AbstractMenu {
         String teleportName = main.getConfig().getString("teleportItem.name", "Teleport");
         int teleportPrice = main.getConfig().getInt("teleportItem.preis");
         ItemStack teleportItem = createMenuItem(
-                ChatColor.BLUE + teleportName,
+                ChatColor.GOLD + teleportName,
                 Material.ENDER_PEARL,
                 ChatColor.GREEN + "Preis: $" + teleportPrice,
                 coords,

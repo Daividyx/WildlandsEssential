@@ -3,15 +3,14 @@ package de.blockorca.wildlandsEssential.listener;
 import de.blockorca.wildlandsEssential.Main;
 import de.blockorca.wildlandsEssential.gui.*;
 import org.bukkit.ChatColor;
-import org.bukkit.block.data.type.Barrel;
-import org.bukkit.block.data.type.Switch;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Material;
+
+import java.util.List;
 
 public class GuiListener implements Listener {
 
@@ -23,17 +22,11 @@ public class GuiListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) {
-            return;
-        }
+        if (!(event.getWhoClicked() instanceof Player)) return;
 
         Player player = (Player) event.getWhoClicked();
         ItemStack clickedItem = event.getCurrentItem();
-        String inventoryTitle = event.getView().getTitle();
-
-        if (clickedItem == null || clickedItem.getType() == Material.AIR) {
-            return;
-        }
+        if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
 
         String menuTitle = event.getView().getTitle();
         event.setCancelled(true); // Verhindert das Herausnehmen von Items
@@ -63,205 +56,181 @@ public class GuiListener implements Listener {
         }
     }
 
+    // ============================
+    // 1) HAUPTMENÜ
+    // ============================
     private void handleMainMenuClick(Player player, ItemStack clickedItem) {
         switch (clickedItem.getType()) {
             case GOLD_INGOT:
                 new GuiEconomy(main, player).openMenu();
                 break;
-
             case RED_BED:
                 new GuiHome(main, player).openMenu();
                 break;
-
             case ENDER_PEARL:
                 new GuiWarp(main, player).openMenu();
                 break;
-
             case CHEST:
                 new GuiDeadChest(main, player).openMenu();
                 break;
-
             case NETHER_STAR:
                 new GuiBuyable(main, player).openMenu();
                 break;
-
             default:
-                // Falls keiner der obigen Fälle zutrifft, passiert nichts
                 break;
         }
     }
 
-
+    // ============================
+    // 2) BANK (Beispiel)
+    // ============================
     private void handleEconomyMenuClick(Player player, ItemStack clickedItem) {
         if (clickedItem.getType() == Material.BARRIER) {
-
             new GuiMainMenu(main, player).openMenu();
         }
     }
 
+    // ============================
+    // 3) HOMES
+    // ============================
     private void handleHomesMenuClick(Player player, ItemStack clickedItem) {
+        String previousInventoryTitle = "Homes";
+        String itemName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
 
-        switch (ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName())) {
-
+        switch (itemName) {
             case "Zurück":
                 new GuiMainMenu(main, player).openMenu();
                 break;
             case "Home 1":
-                new GuiConfirm(main, player,clickedItem,"Homes").openMenu();
-                break;
             case "Home 2":
-                new GuiConfirm(main, player,clickedItem,"Homes").openMenu();
-                break;
             case "Home 3":
-                new GuiConfirm(main, player,clickedItem,"Homes").openMenu();
-                break;
             case "Home 4":
-                new GuiConfirm(main, player,clickedItem,"Homes").openMenu();
-                break;
             case "Home 5":
-                new GuiConfirm(main, player,clickedItem,"Homes").openMenu();
+                // 1) Kombinierter String: z.B. "Homes;Home 1"
+                String combined = previousInventoryTitle + ";" + itemName;
+                // 2) Confirm GUI öffnen, dataString übergeben
+                new GuiConfirm(main, player, combined).openMenu();
                 break;
         }
     }
 
+    // ============================
+    // 4) WARP
+    // ============================
     private void handleWarpMenuClick(Player player, ItemStack clickedItem) {
-        switch (ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName())) {
+        String previousInventoryTitle = "Warp Menü";
+        String itemName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
+
+        switch (itemName) {
             case "Zurück":
                 new GuiMainMenu(main, player).openMenu();
                 break;
             case "Warp 1":
-                new GuiConfirm(main, player,clickedItem,"Warp Menü").openMenu();
-                break;
             case "Warp 2":
-                new GuiConfirm(main, player,clickedItem,"Warp Menü").openMenu();
-                break;
             case "Warp 3":
-                new GuiConfirm(main, player,clickedItem,"Warp Menü").openMenu();
-                break;
             case "Warp 4":
-                new GuiConfirm(main, player,clickedItem,"Warp Menü").openMenu();
-                break;
             case "Warp 5":
-                new GuiConfirm(main, player,clickedItem,"Warp Menü").openMenu();
+                String combined = previousInventoryTitle + ";" + itemName;
+                new GuiConfirm(main, player, combined).openMenu();
                 break;
         }
     }
 
+    // ============================
+    // 5) DEADCHEST
+    // ============================
     private void handleDeadChestMenuClick(Player player, ItemStack clickedItem) {
-        switch (ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName())) {
+        String previousInventoryTitle = "DeadChest Menü";
+        String itemName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
+
+        switch (itemName) {
             case "Zurück":
                 new GuiMainMenu(main, player).openMenu();
                 break;
-            case "Kaufen":
-                new GuiConfirm(main, player,clickedItem,"DeadChest Menü").openMenu();
-                break;
+            case "DeadChest Kaufen":
             case "Teleport":
-                new GuiConfirm(main, player,clickedItem,"DeadChest Menü").openMenu();
+                String combined = previousInventoryTitle + ";" + itemName;
+                // Debug-Ausgabe
+                player.sendMessage("DEBUG: DeadChest combined=" + combined);
+                new GuiConfirm(main, player, combined).openMenu();
                 break;
         }
     }
 
+    // ============================
+    // 6) KAUFBARE FUNKTIONEN
+    // ============================
     private void handleBuyableMenuClick(Player player, ItemStack clickedItem) {
+        String previousInventoryTitle = "Kaufbare Funktionen";
+
         switch (clickedItem.getType()) {
-            //Zurück
             case BARRIER:
                 new GuiMainMenu(main, player).openMenu();
                 break;
-            //Fliegen
             case FEATHER:
-                new GuiConfirm(main, player,clickedItem,"Kaufbare Funktionen").openMenu();
+                // Fliegen
+                new GuiConfirm(main, player, previousInventoryTitle + ";Fliegen kaufen").openMenu();
                 break;
-            //Alleine Schlafen
             case RED_BED:
-                new GuiConfirm(main, player,clickedItem,"Kaufbare Funktionen").openMenu();
+                // Alleine schlafen
+                new GuiConfirm(main, player, previousInventoryTitle + ";Alleine schlafen").openMenu();
                 break;
-            //Item 1
             case LANTERN:
-                new GuiConfirm(main, player,clickedItem,"Kaufbare Funktionen").openMenu();
+                // Item 1
+                new GuiConfirm(main, player, previousInventoryTitle + ";Item 1").openMenu();
                 break;
-            //Item 2
             case SOUL_LANTERN:
-                new GuiConfirm(main, player,clickedItem,"Kaufbare Funktionen").openMenu();
+                // Item 2
+                new GuiConfirm(main, player, previousInventoryTitle + ";Item 2").openMenu();
                 break;
-            //Item 3
             case SOUL_CAMPFIRE:
-                new GuiConfirm(main, player,clickedItem,"Kaufbare Funktionen").openMenu();
+                // Item 3
+                new GuiConfirm(main, player, previousInventoryTitle + ";Item 3").openMenu();
                 break;
-
         }
     }
 
+    // ============================
+    // 7) CONFIRM (Ja/Nein)
+    // ============================
     private void handleConfirmMenuClick(Player player, ItemStack clickedItem) {
-        // Holen wir die aktuell geöffnete GUI-Instanz
-        GuiConfirm confirmGui = new GuiConfirm(main, player, clickedItem, ""); // Platzhalter
-        String previousInventory = confirmGui.getPreviousInventoryTitle();
-        ItemStack originalItem = confirmGui.getClickedItem(); // **DAS Item, das wirklich gekauft wird!**
+        // Klick auf LIME_WOOL => Bestätigen, Klick auf RED_WOOL => Abbrechen
+        if (clickedItem.getType() == Material.LIME_WOOL) {
+            // Lese Lore aus
+            List<String> lore = clickedItem.getItemMeta().getLore();
+            if (lore == null || lore.isEmpty()) {
+                player.sendMessage(ChatColor.RED + "Fehler: Keine Lore-Daten gefunden!");
+                return;
+            }
+            // Letzte Zeile z.B. "Homes;Home 1"
+            String dataLine = ChatColor.stripColor(lore.get(lore.size() - 1));
+            String[] parts = dataLine.split(";");
+            if (parts.length < 2) {
+                player.sendMessage(ChatColor.RED + "Fehler: Ungültige Daten: " + dataLine);
+                return;
+            }
+            String previousMenu = parts[0];
+            String itemName = parts[1];
 
-        // Falls originalItem null ist, brechen wir ab
-        if (originalItem == null || !originalItem.hasItemMeta() || !originalItem.getItemMeta().hasDisplayName()) {
-            player.sendMessage(ChatColor.RED + "Fehler: Kein gültiges Kauf-Item gefunden!");
-            return;
-        }
+            // KAUF-LOGIK
+            player.sendMessage(ChatColor.GREEN + "Du hast " + itemName + " aus " + previousMenu + " gekauft!");
+            switch (itemName){
+                case "Home 1":
+                case "Home 2":
+                case "Home 3":
+                case "Home 4":
+                case "Home 5":
+                    player.sendMessage(ChatColor.GREEN + "Du hast " + itemName + " aus " + previousMenu);
+                    //Warp Logic
 
-        String originalItemName = ChatColor.stripColor(originalItem.getItemMeta().getDisplayName()); // Name ohne Farbcodes
-
-        if (clickedItem.getType() == Material.LIME_WOOL) { // Spieler bestätigt Kauf
-            player.sendMessage(ChatColor.GREEN + "Du hast " + originalItemName + " gekauft!");
-
-            // **Hier kommt die Kauf-Logik für das gekaufte Item**
-            switch (originalItemName) {
-                case "Fliegen kaufen":
-                    player.sendMessage(ChatColor.GREEN + "Du kannst jetzt fliegen!");
-                    player.setAllowFlight(true);
-                    break;
-
-                case "Alleine schlafen":
-                    player.sendMessage(ChatColor.GREEN + "Du kannst jetzt alleine schlafen!");
-                    // Setze irgendeine Permission oder Variable
-                    break;
-
-                case "Warp 1":
-                    player.sendMessage(ChatColor.GREEN + "Du hast Warp 1 freigeschaltet!");
-                    // Speichere den Warp für den Spieler
-                    break;
-
-                case "Kaufen":
-                    player.sendMessage(ChatColor.GREEN + "Du hast eine DeadChest gekauft!");
-                    // Logik für DeadChest-Kauf
-                    break;
-
-                case "Teleport":
-                    player.sendMessage(ChatColor.GREEN + "Du wirst zu deiner DeadChest teleportiert!");
-                    // Spieler zu gespeicherten Koordinaten teleportieren
-                    break;
-
-                default:
-                    player.sendMessage(ChatColor.RED + "Unbekannter Kauf: " + originalItemName);
-                    break;
             }
 
-        } else if (clickedItem.getType() == Material.RED_WOOL) { // Spieler bricht Kauf ab
-            switch (previousInventory) {
-                case "Homes":
-                    new GuiHome(main, player).openMenu();
-                    break;
-                case "Warp Menü":
-                    new GuiWarp(main, player).openMenu();
-                    break;
-                case "DeadChest Menü":
-                    new GuiDeadChest(main, player).openMenu();
-                    break;
-                case "Kaufbare Funktionen":
-                    new GuiBuyable(main, player).openMenu();
-                    break;
-            }
+        } else if (clickedItem.getType() == Material.RED_WOOL) {
+            // Abbrechen => Evtl. kein Lore => Dann Standardbehandlung
+            // Du könntest hier z.B. "Zurück zum Hauptmenü" machen oder
+            // Lore abfragen wie oben.
+            // Ich zeige dir hier einfach "Zurück zum Hauptmenü":
+            new GuiMainMenu(main, player).openMenu();
         }
     }
-
-
-
-
-
 }
-
-
