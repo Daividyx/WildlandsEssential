@@ -1,7 +1,12 @@
 package de.blockorca.wildlandsEssential.listener;
 
+import com.earth2me.essentials.User;
 import de.blockorca.wildlandsEssential.Main;
+import de.blockorca.wildlandsEssential.economy.EconomyManager;
 import de.blockorca.wildlandsEssential.gui.*;
+import de.blockorca.wildlandsEssential.logic.DeadChestLogic;
+import de.blockorca.wildlandsEssential.logic.FlyLogic;
+import net.ess3.api.MaxMoneyException;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,6 +15,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Material;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GuiListener implements Listener {
@@ -22,37 +30,40 @@ public class GuiListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) return;
+        String[] blockedMenu = {"Hauptmenü","Bank","Homes","Warp Menü","DeadChest Menü","Kaufbare Funktionen","Kauf Bestätigen"};
+        if(Arrays.asList(blockedMenu).contains(event.getView().getTitle())) {
+            if (!(event.getWhoClicked() instanceof Player)) return;
 
-        Player player = (Player) event.getWhoClicked();
-        ItemStack clickedItem = event.getCurrentItem();
-        if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+            Player player = (Player) event.getWhoClicked();
+            ItemStack clickedItem = event.getCurrentItem();
+            if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
 
-        String menuTitle = event.getView().getTitle();
-        event.setCancelled(true); // Verhindert das Herausnehmen von Items
+            String menuTitle = event.getView().getTitle();
+            event.setCancelled(true); // Verhindert das Herausnehmen von Items
 
-        switch (menuTitle) {
-            case "Hauptmenü":
-                handleMainMenuClick(player, clickedItem);
-                break;
-            case "Bank":
-                handleEconomyMenuClick(player, clickedItem);
-                break;
-            case "Homes":
-                handleHomesMenuClick(player, clickedItem);
-                break;
-            case "Warp Menü":
-                handleWarpMenuClick(player, clickedItem);
-                break;
-            case "DeadChest Menü":
-                handleDeadChestMenuClick(player, clickedItem);
-                break;
-            case "Kaufbare Funktionen":
-                handleBuyableMenuClick(player, clickedItem);
-                break;
-            case "Kauf Bestätigen":
-                handleConfirmMenuClick(player, clickedItem);
-                break;
+            switch (menuTitle) {
+                case "Hauptmenü":
+                    handleMainMenuClick(player, clickedItem);
+                    break;
+                case "Bank":
+                    handleEconomyMenuClick(player, clickedItem);
+                    break;
+                case "Homes":
+                    handleHomesMenuClick(player, clickedItem);
+                    break;
+                case "Warp Menü":
+                    handleWarpMenuClick(player, clickedItem);
+                    break;
+                case "DeadChest Menü":
+                    handleDeadChestMenuClick(player, clickedItem);
+                    break;
+                case "Kaufbare Funktionen":
+                    handleBuyableMenuClick(player, clickedItem);
+                    break;
+                case "Kauf Bestätigen":
+                    handleConfirmMenuClick(player, clickedItem);
+                    break;
+            }
         }
     }
 
@@ -106,10 +117,7 @@ public class GuiListener implements Listener {
             case "Home 3":
             case "Home 4":
             case "Home 5":
-                // 1) Kombinierter String: z.B. "Homes;Home 1"
-                String combined = previousInventoryTitle + ";" + itemName;
-                // 2) Confirm GUI öffnen, dataString übergeben
-                new GuiConfirm(main, player, combined).openMenu();
+
                 break;
         }
     }
@@ -148,11 +156,10 @@ public class GuiListener implements Listener {
                 new GuiMainMenu(main, player).openMenu();
                 break;
             case "DeadChest Kaufen":
+                new DeadChestLogic(main).buyDeadchestUnlock(player);
             case "Teleport":
-                String combined = previousInventoryTitle + ";" + itemName;
-                // Debug-Ausgabe
-                player.sendMessage("DEBUG: DeadChest combined=" + combined);
-                new GuiConfirm(main, player, combined).openMenu();
+
+
                 break;
         }
     }
@@ -169,24 +176,21 @@ public class GuiListener implements Listener {
                 break;
             case FEATHER:
                 // Fliegen
-                new GuiConfirm(main, player, previousInventoryTitle + ";Fliegen kaufen").openMenu();
-                break;
+                FlyLogic flyLogic = new FlyLogic(main);
+                flyLogic.enableFly(player);
+                player.closeInventory();
             case RED_BED:
                 // Alleine schlafen
-                new GuiConfirm(main, player, previousInventoryTitle + ";Alleine schlafen").openMenu();
-                break;
+
             case LANTERN:
                 // Item 1
-                new GuiConfirm(main, player, previousInventoryTitle + ";Item 1").openMenu();
-                break;
+
             case SOUL_LANTERN:
                 // Item 2
-                new GuiConfirm(main, player, previousInventoryTitle + ";Item 2").openMenu();
-                break;
+
             case SOUL_CAMPFIRE:
                 // Item 3
-                new GuiConfirm(main, player, previousInventoryTitle + ";Item 3").openMenu();
-                break;
+
         }
     }
 
@@ -213,24 +217,40 @@ public class GuiListener implements Listener {
             String itemName = parts[1];
 
             // KAUF-LOGIK
-            player.sendMessage(ChatColor.GREEN + "Du hast " + itemName + " aus " + previousMenu + " gekauft!");
-            switch (itemName){
+           // player.sendMessage(ChatColor.GREEN + "Du hast " + itemName + " aus " + previousMenu + " gekauft!");
+            switch (itemName) {
                 case "Home 1":
                 case "Home 2":
                 case "Home 3":
                 case "Home 4":
                 case "Home 5":
-                    player.sendMessage(ChatColor.GREEN + "Du hast " + itemName + " aus " + previousMenu);
+
                     //Warp Logic
+                case "Warp 1":
+                case "Warp 2":
+                case "Warp 3":
+                case "Warp 4":
+                case "Warp 5":
+                    //DeadChest
+                case "a":
+                case "aa":
+                case "aaa":
+                case "aaaa":
+                case "aaaaa":
+                    //buyable
+                case "Fliegen kaufen":
+                    FlyLogic flyLogic = new FlyLogic(main);
+                    flyLogic.enableFly(player);
+                    player.closeInventory();
 
             }
 
-        } else if (clickedItem.getType() == Material.RED_WOOL) {
-            // Abbrechen => Evtl. kein Lore => Dann Standardbehandlung
-            // Du könntest hier z.B. "Zurück zum Hauptmenü" machen oder
-            // Lore abfragen wie oben.
-            // Ich zeige dir hier einfach "Zurück zum Hauptmenü":
-            new GuiMainMenu(main, player).openMenu();
+            } else if (clickedItem.getType() == Material.RED_WOOL) {
+                // Abbrechen => Evtl. kein Lore => Dann Standardbehandlung
+                // Du könntest hier z.B. "Zurück zum Hauptmenü" machen oder
+                // Lore abfragen wie oben.
+                // Ich zeige dir hier einfach "Zurück zum Hauptmenü":
+                new GuiMainMenu(main, player).openMenu();
+            }
         }
     }
-}

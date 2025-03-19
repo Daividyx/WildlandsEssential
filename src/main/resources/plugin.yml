@@ -9,15 +9,7 @@ commands:
   menu:
     description: Opens the Plugin's main menu
     usage: /menu
-  economy:
-    description: Opens the economy menu
-    usage: /economy
-  warps:
-    description: Opens the warp menu
-    usage: /warps
-  deadchest:
-    description: Opens the dead chest menu
-    usage: /deadchest
-  buyable:
-    description: Opens the buyable functions menu
-    usage: /buyable
+  wildlands:
+    description: reload the configs
+    usage: /wildlands reload
+

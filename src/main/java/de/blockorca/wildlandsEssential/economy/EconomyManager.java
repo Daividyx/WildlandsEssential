@@ -14,57 +14,46 @@ public class EconomyManager {
     private final Essentials essentials;
 
     public EconomyManager(Essentials essentials) {
+
+
         this.essentials = essentials;
     }
 
-    public BigDecimal getBalance(Player player) {
+    public boolean canAfford(Player player, long amount) {
 
-        User user = essentials.getUser(player);
-        if(user == null){
-            return BigDecimal.ZERO;
+        BigDecimal balance = essentials.getUser(player).getMoney();
+
+        if(balance.compareTo(BigDecimal.valueOf(amount)) >= 0) {
+
+                return true;
         }
-        return user.getMoney();
+
+        return false;
+
+
+
+
     }
 
-    public void setBalance(Player player, BigDecimal amount) {
+    public void takeMoney(Player player, long amount) {
         User user = essentials.getUser(player);
-        if (user == null) {
-            return;
-        }
-        try {
-            user.setMoney(amount);
-
-        }
-        catch (MaxMoneyException e) {
-            player.sendMessage(ChatColor.RED + "Du kannst nicht mehr als 10000000000000 Dollar besitzen!");
-        }
-
-}
-
-    public void addBalance(Player player, BigDecimal amount) {
-
-        User user = essentials.getUser(player);
-        if (user == null) {
-            return;
-        }
-        BigDecimal balance = user.getMoney();
-        if(amount.compareTo(BigDecimal.ZERO) < 0) {
-            try {
-                user.setMoney(balance.add(amount));
-            } catch (MaxMoneyException e) {
-                player.sendMessage("Da ist was schief gelaufen. Ich glaube die Zahl war zu hoch");
-            }
-        }
-        if(amount.compareTo(BigDecimal.ZERO) > 0) {
-            try {
-                user.setMoney(balance.add(amount));
-            } catch (MaxMoneyException e) {
-                player.sendMessage("Da ist was schief gelaufen. Ich glaube die Zahl war zu hoch");
-            }
-        }
+        user.takeMoney(BigDecimal.valueOf(amount));
     }
 
-
+/*
+*
+*
+* Gestorben 0,0,0
+* Kisten 0,1,0 // 1,1,0  Facing North
+* Barrieren: (2,0,0)(2,1,0)(2,2,0)
+*            (1,0,0)(1,2,0)
+*            (-1,0-0)(-1,1,0)(-1,2.0)
+*           ()()()()()()()()()()()()()()()
+*
+*
+*
+*
+* */
 
 
 }

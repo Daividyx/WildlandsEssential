@@ -45,8 +45,8 @@ public class GuiMainMenu extends AbstractMenu{
         inv.setItem(deadChestIndex,deadChestItem);
 
         int buyableFunctionsIndex = main.getConfig().getInt("buyableItem.position");
-        String buyableItemName = main.getConfig().getString("buayableItem.name");
-        String buyableItemLore = main.getConfig().getString("buayableItem.lore");
+        String buyableItemName = main.getConfig().getString("buyableItem.name");
+        String buyableItemLore = main.getConfig().getString("buyableItem.lore");
         ItemStack buayable = createMenuItem(ChatColor.GOLD+ buyableItemName, Material.NETHER_STAR,ChatColor.GREEN+buyableItemLore);
         inv.setItem(buyableFunctionsIndex,buayable);
 

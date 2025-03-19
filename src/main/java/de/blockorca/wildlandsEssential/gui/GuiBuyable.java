@@ -1,6 +1,7 @@
 package de.blockorca.wildlandsEssential.gui;
 
 import de.blockorca.wildlandsEssential.Main;
+import de.blockorca.wildlandsEssential.data.ConfigManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,8 +10,12 @@ import org.bukkit.inventory.ItemStack;
 
 public class GuiBuyable extends AbstractMenu {
 
+   private ConfigManager configManager;
+
+
     public GuiBuyable(Main main, Player player) {
         super(main, player, "Kaufbare Funktionen", 45);
+        this.configManager = main.getConfigManager();
     }
 
     @Override
@@ -18,7 +23,7 @@ public class GuiBuyable extends AbstractMenu {
         // Fliegen kaufen
         int flyIndex = main.getConfig().getInt("buyableItem1.position");
         String flyName = main.getConfig().getString("buyableItem1.name");
-        int flyPrice = main.getConfig().getInt("buyableItem1.preis");
+        int flyPrice = (int) configManager.getFlyPrice();
         ItemStack flyItem = createMenuItem(ChatColor.GOLD + flyName, Material.FEATHER,
                 ChatColor.GREEN + "Preis: " + ChatColor.RED + flyPrice,
                 ChatColor.AQUA + "Kaufe dir die Fähigkeit zu fliegen für 1 Stunde.");
@@ -27,7 +32,7 @@ public class GuiBuyable extends AbstractMenu {
         // Alleine schlafen
         int sleepIndex = main.getConfig().getInt("buyableItem2.position");
         String sleepName = main.getConfig().getString("buyableItem2.name");
-        int sleepPrice = main.getConfig().getInt("buyableItem2.preis");
+        int sleepPrice = (int) configManager.getAloneSleepPrice();
         ItemStack sleepItem = createMenuItem(ChatColor.GOLD + sleepName, Material.RED_BED,
                 ChatColor.GREEN + "Preis: " + ChatColor.RED + sleepPrice,
                 ChatColor.AQUA + "Ermöglicht es dir, alleine die Nacht zu überspringen.");
@@ -36,7 +41,7 @@ public class GuiBuyable extends AbstractMenu {
         // Kaufbares Item 1
         int item1Index = main.getConfig().getInt("buyableItem3.position");
         String item1Name = main.getConfig().getString("buyableItem3.name");
-        int item1Price = main.getConfig().getInt("buyableItem3.preis");
+        int item1Price = (int) configManager.getBuyable1Price();
         ItemStack item1 = createMenuItem(ChatColor.GOLD + item1Name, Material.LANTERN,
                 ChatColor.GREEN + "Preis: " + ChatColor.RED + item1Price,
                 ChatColor.AQUA + "Ein zusätzlich kaufbares Item.");
@@ -45,7 +50,7 @@ public class GuiBuyable extends AbstractMenu {
         // Kaufbares Item 2
         int item2Index = main.getConfig().getInt("buyableItem4.position");
         String item2Name = main.getConfig().getString("buyableItem4.name");
-        int item2Price = main.getConfig().getInt("buyableItem4.preis");
+        int item2Price = (int) configManager.getBuyable2Price();
         ItemStack item2 = createMenuItem(ChatColor.GOLD + item2Name, Material.SOUL_LANTERN,
                 ChatColor.GREEN + "Preis: " + ChatColor.RED + item2Price,
                 ChatColor.AQUA + "Ein weiteres kaufbares Item.");
@@ -54,7 +59,7 @@ public class GuiBuyable extends AbstractMenu {
         // Kaufbares Item 3
         int item3Index = main.getConfig().getInt("buyableItem5.position");
         String item3Name = main.getConfig().getString("buyableItem5.name");
-        int item3Price = main.getConfig().getInt("buyableItem5.preis");
+        int item3Price = (int) configManager.getBuyable3Price();
         ItemStack item3 = createMenuItem(ChatColor.GOLD + item3Name, Material.SOUL_CAMPFIRE,
                 ChatColor.GREEN + "Preis: " + ChatColor.RED + item3Price,
                 ChatColor.AQUA + "Ein seltenes kaufbares Item.");

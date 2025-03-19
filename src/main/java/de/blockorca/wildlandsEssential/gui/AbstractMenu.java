@@ -1,6 +1,7 @@
 package de.blockorca.wildlandsEssential.gui;
 
 import de.blockorca.wildlandsEssential.Main;
+import de.blockorca.wildlandsEssential.data.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -20,11 +21,13 @@ public abstract class AbstractMenu implements GuiMenu {
     private final String title;
     private final int size;
 
+
     public AbstractMenu(Main main, Player player, String title, int size) {
         this.main = main;
         this.player = player;
         this.title = title;
         this.size = size;
+
 
     }
 

@@ -1,6 +1,7 @@
 package de.blockorca.wildlandsEssential.gui;
 
 import com.earth2me.essentials.Essentials;
+import com.earth2me.essentials.User;
 import de.blockorca.wildlandsEssential.Main;
 import de.blockorca.wildlandsEssential.economy.EconomyManager;
 import org.bukkit.ChatColor;
@@ -16,16 +17,18 @@ public class GuiEconomy extends AbstractMenu{
     public GuiEconomy (Main main, Player player){
 
         super(main,player,"Bank",45);
+
     }
     Essentials essentials = main.getEssentials();
 
     protected void placeItems(Inventory inv) {
 
-        EconomyManager eco = new EconomyManager(essentials);
+        Essentials essentials = main.getEssentials();
+       User user= essentials.getUser(player);
         //Balance Item
         int balanceIndex = main.getConfig().getInt("balanceItem.position");
         String balanceItemName = main.getConfig().getString("balanceItem.name");
-        ItemStack balanceItem = createMenuItem(ChatColor.GOLD + balanceItemName,Material.GOLD_INGOT,ChatColor.GREEN + "Dein aktueller Kontostand: " + ChatColor.RED +"$"+ eco.getBalance(player).toString());
+        ItemStack balanceItem = createMenuItem(ChatColor.GOLD + balanceItemName,Material.GOLD_INGOT,ChatColor.GREEN + "Dein aktueller Kontostand: " + ChatColor.RED +"$"+ user.getMoney().toString());
         inv.setItem(balanceIndex, balanceItem);
         //Info Item
         int infoIndex = main.getConfig().getInt("economyInfoItem.position");

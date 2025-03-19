@@ -1,6 +1,7 @@
 package de.blockorca.wildlandsEssential.gui;
 
 import de.blockorca.wildlandsEssential.Main;
+import de.blockorca.wildlandsEssential.data.ConfigManager;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,42 +10,48 @@ import org.bukkit.inventory.ItemStack;
 
 public class GuiDeadChest extends AbstractMenu {
 
+    private ConfigManager configManager;
+
     public GuiDeadChest(Main main, Player player) {
         super(main, player, "DeadChest Menü", 45);
+        this.configManager = main.getConfigManager();
     }
 
     @Override
     protected void placeItems(Inventory inv) {
         // DeadChest-Koordinaten aus der Config laden
         String world = main.getConfig().getString("deadChest.world", "world");
-        int x = main.getConfig().getInt("deadChest.x", 0);
-        int y = main.getConfig().getInt("deadChest.y", 0);
-        int z = main.getConfig().getInt("deadChest.z", 0);
-        String coords = ChatColor.AQUA + "Koordinaten: " + ChatColor.RED + world + " (" + x + ", " + y + ", " + z + ")";
+        int x = configManager.getDeadChestX(player);
+        int y = configManager.getDeadChestY(player);
+        int z = configManager.getDeadChestZ(player);
+        String coords = ChatColor.AQUA + "Koordinaten: " + ChatColor.RED + " (" + x + ", " + y + ", " + z + ")";
 
         // Kaufen-Item
         int buyIndex = main.getConfig().getInt("buyItem.position");
         String buyName = main.getConfig().getString("buyItem.name");
-        int buyPrice = main.getConfig().getInt("buyItem.preis");
+        int buyPrice = (int) configManager.getDeadChestOpenPrice();
         ItemStack buyItem = createMenuItem(
                 ChatColor.GOLD + buyName,
                 Material.EMERALD,
                 ChatColor.GREEN + "Preis: $" + buyPrice,
+                ChatColor.AQUA + "Hast du eine DeadChest? [True / False]" + ChatColor.RED + configManager.isDeadChest(player),
                 coords,
-                ChatColor.YELLOW + "Kaufe deine Items zurück!"
+                ChatColor.YELLOW + "Kaufe deine Items zurück!",
+                ChatColor.YELLOW + "Zum zurückkaufen muss sich die Kiste innerhalb von 5 Blöcken um dich herum befinden!"
         );
         inv.setItem(buyIndex, buyItem);
 
         // Teleport-Item
         int teleportIndex = main.getConfig().getInt("teleportItem.position");
         String teleportName = main.getConfig().getString("teleportItem.name", "Teleport");
-        int teleportPrice = main.getConfig().getInt("teleportItem.preis");
+        int teleportPrice = (int) configManager.getDeadChestTeleportPrice();
         ItemStack teleportItem = createMenuItem(
                 ChatColor.GOLD + teleportName,
                 Material.ENDER_PEARL,
                 ChatColor.GREEN + "Preis: $" + teleportPrice,
                 coords,
-                ChatColor.YELLOW + "Teleportiere dich zu deiner DeadChest!"
+                ChatColor.YELLOW + "Teleportiere dich zu deiner DeadChest!",
+                ChatColor.YELLOW + "Du musst sie aber trotzdem noch kaufen auch wenn du dich hinteleportierst"
         );
         inv.setItem(teleportIndex, teleportItem);
 
