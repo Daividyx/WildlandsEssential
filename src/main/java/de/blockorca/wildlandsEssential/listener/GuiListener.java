@@ -1,75 +1,95 @@
 package de.blockorca.wildlandsEssential.listener;
 
-import com.earth2me.essentials.User;
+
 import de.blockorca.wildlandsEssential.Main;
-import de.blockorca.wildlandsEssential.economy.EconomyManager;
+
 import de.blockorca.wildlandsEssential.gui.*;
 import de.blockorca.wildlandsEssential.logic.DeadChestLogic;
 import de.blockorca.wildlandsEssential.logic.FlyLogic;
-import net.ess3.api.MaxMoneyException;
+
+import de.blockorca.wildlandsEssential.logic.HomeLogic;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.Material;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
+
 import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 
+/**
+ * Listener for handling GUI interactions.
+ *
+ * <p>This class intercepts inventory click events for specific GUI menus and routes the events
+ * to the appropriate handler methods based on the menu title and the clicked item.</p>
+ */
 public class GuiListener implements Listener {
 
     private final Main main;
 
+    /**
+     * Constructs a new GuiListener.
+     *
+     * @param main the main plugin instance used to access various components and GUIs.
+     */
     public GuiListener(Main main) {
         this.main = main;
     }
 
+    /**
+     * Handles inventory click events for blocked GUI menus.
+     *
+     * <p>If the inventory title matches one of the predefined blocked menus, the event is cancelled
+     * and the appropriate handler method is invoked based on the menu title.</p>
+     *
+     * @param event the inventory click event.
+     */
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        String[] blockedMenu = {"Hauptmenü","Bank","Homes","Warp Menü","DeadChest Menü","Kaufbare Funktionen","Kauf Bestätigen"};
-        if(Arrays.asList(blockedMenu).contains(event.getView().getTitle())) {
-            if (!(event.getWhoClicked() instanceof Player)) return;
+        String[] blockedMenu = {"Hauptmenü", "Bank", "Homes", "Warp Menü", "DeadChest Menü", "Kaufbare Funktionen", "Kauf Bestätigen"};
+        if (Arrays.asList(blockedMenu).contains(event.getView().getTitle())) {
+            if (!(event.getWhoClicked() instanceof Player player)) return;
 
-            Player player = (Player) event.getWhoClicked();
             ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
 
             String menuTitle = event.getView().getTitle();
-            event.setCancelled(true); // Verhindert das Herausnehmen von Items
+            event.setCancelled(true); // Prevent item removal from the GUI
 
             switch (menuTitle) {
-                case "Hauptmenü":
-                    handleMainMenuClick(player, clickedItem);
-                    break;
-                case "Bank":
-                    handleEconomyMenuClick(player, clickedItem);
-                    break;
-                case "Homes":
-                    handleHomesMenuClick(player, clickedItem);
-                    break;
-                case "Warp Menü":
-                    handleWarpMenuClick(player, clickedItem);
-                    break;
-                case "DeadChest Menü":
-                    handleDeadChestMenuClick(player, clickedItem);
-                    break;
-                case "Kaufbare Funktionen":
-                    handleBuyableMenuClick(player, clickedItem);
-                    break;
-                case "Kauf Bestätigen":
-                    handleConfirmMenuClick(player, clickedItem);
-                    break;
+                case "Hauptmenü" -> handleMainMenuClick(player, clickedItem);
+
+
+                case "Bank" -> handleEconomyMenuClick(player, clickedItem);
+
+
+                case "Homes" -> handleHomesMenuClick(player, clickedItem);
+
+
+                case "Warp Menü" -> handleWarpMenuClick(player, clickedItem);
+
+
+                case "DeadChest Menü" -> handleDeadChestMenuClick(player, clickedItem);
+
+
+                case "Kaufbare Funktionen" -> handleBuyableMenuClick(player, clickedItem);
+
+
             }
         }
     }
 
-    // ============================
-    // 1) HAUPTMENÜ
-    // ============================
+    /**
+     * Processes clicks in the main menu.
+     *
+     * <p>The method opens the corresponding GUI based on the clicked item type.</p>
+     *
+     * @param player      the player who clicked.
+     * @param clickedItem the item that was clicked.
+     */
     private void handleMainMenuClick(Player player, ItemStack clickedItem) {
         switch (clickedItem.getType()) {
             case GOLD_INGOT:
@@ -92,42 +112,56 @@ public class GuiListener implements Listener {
         }
     }
 
-    // ============================
-    // 2) BANK (Beispiel)
-    // ============================
+    /**
+     * Processes clicks in the economy (bank) menu.
+     *
+     * <p>If the clicked item is a barrier, the main menu is reopened.</p>
+     *
+     * @param player      the player who clicked.
+     * @param clickedItem the item that was clicked.
+     */
     private void handleEconomyMenuClick(Player player, ItemStack clickedItem) {
         if (clickedItem.getType() == Material.BARRIER) {
             new GuiMainMenu(main, player).openMenu();
         }
     }
 
-    // ============================
-    // 3) HOMES
-    // ============================
+    /**
+     * Processes clicks in the homes menu.
+     *
+     * <p>The method checks the display name of the clicked item and opens the main menu when "Zurück" is clicked.
+     * For other home items ("Home 1" to "Home 5"), additional logic can be implemented.</p>
+     *
+     * @param player      the player who clicked.
+     * @param clickedItem the item that was clicked.
+     */
     private void handleHomesMenuClick(Player player, ItemStack clickedItem) {
-        String previousInventoryTitle = "Homes";
-        String itemName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
+        String itemName = ChatColor.stripColor(Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName());
 
         switch (itemName) {
-            case "Zurück":
-                new GuiMainMenu(main, player).openMenu();
-                break;
-            case "Home 1":
-            case "Home 2":
-            case "Home 3":
-            case "Home 4":
-            case "Home 5":
+            case "Zurück" -> new GuiMainMenu(main, player).openMenu();
+            case "Home 1" -> new HomeLogic(main).buyHome(player, 1);
+            case "Home 2" -> new HomeLogic(main).buyHome(player, 2);
+            case "Home 3" -> new HomeLogic(main).buyHome(player, 3);
+            case "Home 4" -> new HomeLogic(main).buyHome(player, 4);
+            case "Home 5" -> new HomeLogic(main).buyHome(player, 5);
 
-                break;
+
         }
     }
 
-    // ============================
-    // 4) WARP
-    // ============================
+    /**
+     * Processes clicks in the warp menu.
+     *
+     * <p>If "Zurück" is clicked, the main menu is reopened. For warp options ("Warp 1" to "Warp 5"),
+     * the confirm GUI is opened with the corresponding data.</p>
+     *
+     * @param player      the player who clicked.
+     * @param clickedItem the item that was clicked.
+     */
     private void handleWarpMenuClick(Player player, ItemStack clickedItem) {
         String previousInventoryTitle = "Warp Menü";
-        String itemName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
+        String itemName = ChatColor.stripColor(Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName());
 
         switch (itemName) {
             case "Zurück":
@@ -144,12 +178,18 @@ public class GuiListener implements Listener {
         }
     }
 
-    // ============================
-    // 5) DEADCHEST
-    // ============================
+    /**
+     * Processes clicks in the DeadChest menu.
+     *
+     * <p>If "Zurück" is clicked, the main menu is reopened. If "DeadChest Kaufen" is clicked,
+     * the DeadChest unlock purchase process is initiated. Additional functionality for "Teleport"
+     * can be added as needed.</p>
+     *
+     * @param player      the player who clicked.
+     * @param clickedItem the item that was clicked.
+     */
     private void handleDeadChestMenuClick(Player player, ItemStack clickedItem) {
-        String previousInventoryTitle = "DeadChest Menü";
-        String itemName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
+        String itemName = ChatColor.stripColor(Objects.requireNonNull(clickedItem.getItemMeta()).getDisplayName());
 
         switch (itemName) {
             case "Zurück":
@@ -157,100 +197,50 @@ public class GuiListener implements Listener {
                 break;
             case "DeadChest Kaufen":
                 new DeadChestLogic(main).buyDeadchestUnlock(player);
+                // Note: Missing break statement intentionally if "Teleport" should be processed in succession.
             case "Teleport":
-
-
+                // Implement teleport logic here if required
                 break;
         }
     }
 
-    // ============================
-    // 6) KAUFBARE FUNKTIONEN
-    // ============================
+    /**
+     * Processes clicks in the buyable functions menu.
+     *
+     * <p>This method handles purchase actions based on the type of the clicked item.
+     * For example, clicking a feather enables flight, while clicking a barrier returns the player
+     * to the main menu. Additional cases can be implemented for other buyable items.</p>
+     *
+     * @param player      the player who clicked.
+     * @param clickedItem the item that was clicked.
+     */
     private void handleBuyableMenuClick(Player player, ItemStack clickedItem) {
-        String previousInventoryTitle = "Kaufbare Funktionen";
 
         switch (clickedItem.getType()) {
             case BARRIER:
                 new GuiMainMenu(main, player).openMenu();
                 break;
             case FEATHER:
-                // Fliegen
+                // Enable flight functionality
                 FlyLogic flyLogic = new FlyLogic(main);
                 flyLogic.enableFly(player);
                 player.closeInventory();
+                break;
             case RED_BED:
-                // Alleine schlafen
-
+                // Logic for sleeping alone can be implemented here
+                break;
             case LANTERN:
-                // Item 1
-
+                // Additional buyable item logic can be added here
+                break;
             case SOUL_LANTERN:
-                // Item 2
-
+                // Additional buyable item logic can be added here
+                break;
             case SOUL_CAMPFIRE:
-                // Item 3
-
+                // Additional buyable item logic can be added here
+                break;
+            default:
+                break;
         }
     }
 
-    // ============================
-    // 7) CONFIRM (Ja/Nein)
-    // ============================
-    private void handleConfirmMenuClick(Player player, ItemStack clickedItem) {
-        // Klick auf LIME_WOOL => Bestätigen, Klick auf RED_WOOL => Abbrechen
-        if (clickedItem.getType() == Material.LIME_WOOL) {
-            // Lese Lore aus
-            List<String> lore = clickedItem.getItemMeta().getLore();
-            if (lore == null || lore.isEmpty()) {
-                player.sendMessage(ChatColor.RED + "Fehler: Keine Lore-Daten gefunden!");
-                return;
-            }
-            // Letzte Zeile z.B. "Homes;Home 1"
-            String dataLine = ChatColor.stripColor(lore.get(lore.size() - 1));
-            String[] parts = dataLine.split(";");
-            if (parts.length < 2) {
-                player.sendMessage(ChatColor.RED + "Fehler: Ungültige Daten: " + dataLine);
-                return;
-            }
-            String previousMenu = parts[0];
-            String itemName = parts[1];
-
-            // KAUF-LOGIK
-           // player.sendMessage(ChatColor.GREEN + "Du hast " + itemName + " aus " + previousMenu + " gekauft!");
-            switch (itemName) {
-                case "Home 1":
-                case "Home 2":
-                case "Home 3":
-                case "Home 4":
-                case "Home 5":
-
-                    //Warp Logic
-                case "Warp 1":
-                case "Warp 2":
-                case "Warp 3":
-                case "Warp 4":
-                case "Warp 5":
-                    //DeadChest
-                case "a":
-                case "aa":
-                case "aaa":
-                case "aaaa":
-                case "aaaaa":
-                    //buyable
-                case "Fliegen kaufen":
-                    FlyLogic flyLogic = new FlyLogic(main);
-                    flyLogic.enableFly(player);
-                    player.closeInventory();
-
-            }
-
-            } else if (clickedItem.getType() == Material.RED_WOOL) {
-                // Abbrechen => Evtl. kein Lore => Dann Standardbehandlung
-                // Du könntest hier z.B. "Zurück zum Hauptmenü" machen oder
-                // Lore abfragen wie oben.
-                // Ich zeige dir hier einfach "Zurück zum Hauptmenü":
-                new GuiMainMenu(main, player).openMenu();
-            }
-        }
-    }
+}

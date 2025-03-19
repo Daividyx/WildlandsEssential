@@ -8,8 +8,6 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -17,35 +15,39 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 /**
- * Die Klasse {@code DeadChestLogic} enthält die gesamte Logik rund um die
- * Erzeugung, Sicherung, Freigabe und Entfernung einer sogenannten "DeadChest".
- * <p>
- * Eine DeadChest ist hier als Doppelkiste realisiert, die bei Bedarf (z. B.
- * nach dem Tod eines Spielers) erstellt wird. Sie kann anschließend durch
- * Barrieren gesichert und später wieder freigegeben oder entfernt werden.
- * <p>
- * Die Position der DeadChest wird in einer Config gespeichert (über den
- * {@link ConfigManager}). Dabei werden jeweils nur die Koordinaten der
- * ersten Kiste (linke Kiste) gesichert; die zweite Kiste wird anhand
- * von {@code x + 1} errechnet.
+ * Handles the logic for managing a DeadChest.
+ *
+ * <p>A DeadChest is implemented as a double chest that can be generated at the player's location,
+ * secured with barriers, unlocked, or removed. The coordinates and state of the DeadChest are stored
+ * in the configuration.</p>
  */
 public class DeadChestLogic {
 
-    /** Referenz auf die Hauptklasse des Plugins. */
+    /**
+     * Main plugin instance.
+     */
     private final Main main;
-    /** Verwalter für die Plugin-Config, speichert u. a. DeadChest-Koordinaten. */
+    /**
+     * Manager for configuration settings and DeadChest coordinates.
+     */
     private final ConfigManager configManager;
+    /**
+     * Manager for economic transactions.
+     */
     private final EconomyManager economyManager;
-    /** Essentials-API-Referenz, falls benötigt. */
+    /**
+     * Essentials API reference.
+     */
     private final Essentials essentials;
-    /** Welt, in der die DeadChest erstellt wird. Wird z. B. beim ersten Bedarf gesetzt. */
+    /**
+     * The world in which the DeadChest is created. This may be set during first use.
+     */
     private World world;
 
     /**
-     * Konstruktor für die DeadChest-Logik. Erzeugt die benötigten Manager-Referenzen
-     * aus der übergebenen Hauptklasse {@code Main}.
+     * Constructs a DeadChestLogic instance.
      *
-     * @param main Hauptplugin-Klasse, um auf ConfigManager/EconomyManager usw. zuzugreifen.
+     * @param main the main plugin instance used to retrieve managers and other dependencies
      */
     public DeadChestLogic(Main main) {
         this.main = main;
@@ -54,16 +56,14 @@ public class DeadChestLogic {
         this.essentials = main.getEssentials();
     }
 
-
     /**
-     * Überprüft, ob sich der Spieler in der Nähe der gespeicherten DeadChest befindet.
-     * <p>
-     * Die erlaubten Abstände betragen maximal 5 Blöcke in X- und Z-Richtung sowie
-     * maximal 2 Blöcke in Y-Richtung. Überschreitet der Spieler eine dieser Grenzen,
-     * gibt es eine entsprechende Fehlermeldung.
+     * Checks if the player is within proximity of their DeadChest.
      *
-     * @param player Spieler, dessen Position geprüft wird.
-     * @return {@code true}, wenn der Spieler nah genug ist; sonst {@code false}.
+     * <p>The allowed range is up to 5 blocks in the X and Z directions and 2 blocks in the Y direction.
+     * Returns true if the player is close enough, otherwise false.</p>
+     *
+     * @param player the player whose location is being checked
+     * @return true if the player is near the DeadChest; false otherwise
      */
     public boolean isNearDeadChest(Player player) {
         Location playerLocation = player.getLocation();
@@ -82,71 +82,64 @@ public class DeadChestLogic {
         return (diffX <= 5 && diffY <= 2 && diffZ <= 5);
     }
 
-
     /**
-     * Erstellt eine neue DeadChest (Doppelkiste) an der Position des Spielers
-     * und legt die übergebenen Items hinein. Ist bereits eine DeadChest vorhanden,
-     * wird diese vorher entfernt.
-     * <p>
-     * Danach wird die neue DeadChest mittels {@link #secureDeadChest(Player, Location, Location)}
-     * mit Barrieren umhüllt.
+     * Generates a new DeadChest (double chest) at the player's position and inserts the specified items.
      *
-     * @param player Spieler, an dessen Position (bzw. {@code Y+1}) die Kiste erzeugt wird.
-     * @param items  Liste von ItemStacks, die in die neue DeadChest eingefügt werden.
+     * <p>If a DeadChest already exists for the player, it is removed before creating the new one.
+     * The chest is created at the player's position (one block above the player's current Y-coordinate)
+     * and secured by surrounding it with barriers. The coordinates are then stored in the configuration.</p>
+     *
+     * @param player the player for whom the DeadChest is created
+     * @param items  the list of items to be added to the DeadChest inventory
      */
     public void generateDeadChest(Player player, List<ItemStack> items) {
 
-        // Welt ermitteln, in der der Spieler sich befindet
         World world = player.getWorld();
 
-        // Prüfen, ob bereits eine DeadChest existiert. Falls ja, entfernen wir sie.
         if (configManager.isDeadChest(player)) {
             int x = configManager.getDeadChestX(player);
             int y = configManager.getDeadChestY(player);
             int z = configManager.getDeadChestZ(player);
             Location oldLocation = new Location(world, x, y, z);
 
-            player.sendMessage("[DEBUG / CreateDeadchest] Entferne vorhandene DeadChest bei " + oldLocation);
+
             removeDeadChest(player);
         }
 
-        // Aktuelle Spielerposition
         int playerX = player.getLocation().getBlockX();
         int playerY = player.getLocation().getBlockY();
         int playerZ = player.getLocation().getBlockZ();
 
-        /*
-         * Doppelkiste erstellen:
-         *   chestLoc1 = (x,   y+1, z)
-         *   chestLoc2 = (x+1, y+1, z)
-         */
-        Location chestLoc1 = new Location(world, playerX,     playerY + 1, playerZ);
+        // Create a double chest:
+        // chestLoc1 = (x, y+1, z)
+        // chestLoc2 = (x+1, y+1, z)
+        Location chestLoc1 = new Location(world, playerX, playerY + 1, playerZ);
         Location chestLoc2 = new Location(world, playerX + 1, playerY + 1, playerZ);
 
-        // Blöcke vorher auf AIR setzen
+        // Clear the blocks by setting them to AIR first
         chestLoc1.getBlock().setType(Material.AIR);
         chestLoc2.getBlock().setType(Material.AIR);
 
-        // Beide Blöcke zu CHEST setzen
+        // Set both blocks to CHEST type
         chestLoc1.getBlock().setType(Material.CHEST);
         chestLoc2.getBlock().setType(Material.CHEST);
 
-        // Chest-BlockData beider Kisten holen, um eine Doppelkiste explizit zu erzwingen
+        // Retrieve the BlockData to enforce the double chest configuration
         Block chestBlock1 = chestLoc1.getBlock();
         Block chestBlock2 = chestLoc2.getBlock();
 
         org.bukkit.block.data.type.Chest chestData1 = (org.bukkit.block.data.type.Chest) chestBlock1.getBlockData();
         org.bukkit.block.data.type.Chest chestData2 = (org.bukkit.block.data.type.Chest) chestBlock2.getBlockData();
 
-        // Ausrichtung beider Kisten, z.B. nach Norden
+        // Set the facing direction for both chests (e.g., NORTH)
         chestData1.setFacing(BlockFace.NORTH);
         chestData2.setFacing(BlockFace.NORTH);
 
-        // Erste Kiste = LEFT, zweite Kiste = RIGHT -> garantiert Doppelkiste
+        // Force double chest formation: first chest is LEFT, second is RIGHT
         chestData1.setType(org.bukkit.block.data.type.Chest.Type.LEFT);
         chestData2.setType(org.bukkit.block.data.type.Chest.Type.RIGHT);
 
-        // BlockData anwenden
+        // Apply the modified BlockData
         chestBlock1.setBlockData(chestData1);
         chestBlock2.setBlockData(chestData2);
 
@@ -156,48 +149,29 @@ public class DeadChestLogic {
         for (ItemStack i : items) {
             chestInventory.addItem(i);
         }
-        /*
-        // Jetzt warten wir einen Tick, bevor wir Items einfügen und Barrieren setzen
-        Bukkit.getScheduler().runTask(main, () -> {
-            // 1) Items einfügen
-            Chest deadChest = (Chest) chestLoc1.getBlock().getState();
-            Inventory chestInventory = deadChest.getInventory();
-
-            for (ItemStack i : items) {
-                chestInventory.addItem(i);
-            }
-
-            // 2) Kiste sichern (Barrieren setzen)
-            secureDeadChest(player, chestLoc1, chestLoc2);
-
-            player.sendMessage(ChatColor.GREEN + "[DEBUG] DeadChest erstellt und gesichert!");
-        });
-        */
 
         secureDeadChest(player, chestLoc1, chestLoc2);
 
-        //DeadChest und Coordinaten in die config Schreiben
+        // Save DeadChest status and coordinates to the configuration
         configManager.setIsDeadChest(player, true);
-        configManager.setDeadChestCoordinates(player,chestLoc1.getBlockX(), chestLoc1.getBlockY(), chestLoc1.getBlockZ());
+        configManager.setDeadChestCoordinates(player, chestLoc1.getBlockX(), chestLoc1.getBlockY(), chestLoc1.getBlockZ());
+        player.sendMessage(ChatColor.GOLD + "No worries! Your items are safely stored in your personal DeadChest. Visit the Wildlands Menu to buy them back");
     }
 
-
     /**
-     * Entfernt eine existierende DeadChest (falls vorhanden). Dabei wird
-     * zunächst {@link #unlockDeadChest(Player)} aufgerufen, um die Barrieren
-     * im entsprechenden Bereich zu entfernen. Anschließend werden beide
-     * Kistenblöcke auf AIR gesetzt und die Config-Einträge zurückgesetzt.
+     * Removes the existing DeadChest for the player, if present.
      *
-     * @param player Spieler, dessen DeadChest entfernt werden soll.
+     * <p>This method first removes the barriers surrounding the DeadChest by unlocking it,
+     * then sets both chest blocks to AIR, and finally resets the corresponding configuration entries.</p>
+     *
+     * @param player the player whose DeadChest is to be removed
      */
     public void removeDeadChest(Player player) {
-        // 1) Welt ermitteln
         World currentWorld = player.getWorld();
         int deadChestX = configManager.getDeadChestX(player);
         int deadChestY = configManager.getDeadChestY(player);
         int deadChestZ = configManager.getDeadChestZ(player);
 
-        // 2) Beide Kistenblöcke entfernen
         Location chestLoc1 = new Location(currentWorld, deadChestX, deadChestY, deadChestZ);
         Location chestLoc2 = new Location(currentWorld, deadChestX + 1, deadChestY, deadChestZ);
 
@@ -210,100 +184,38 @@ public class DeadChestLogic {
         if (block2.getType() == Material.CHEST) {
             block2.setType(Material.AIR);
         }
+        unlockDeadChest(player);
 
-        // 3) Config-Einträge zurücksetzen
         configManager.setIsDeadChest(player, false);
         configManager.setDeadChestCoordinates(player, 123456789, 123456789, 123456789);
     }
 
-
     /**
-     * Sichert die Doppelkiste, indem ein fester 4×3×2-Bereich um die beiden
-     * Kistenblöcke herum mit {@link Material#BARRIER} gefüllt wird. Die
-     * Kistenblöcke selbst werden dabei ausgespart.
-     * <p>
-     * Dieser Bereich reicht in X-Richtung von {@code baseX} bis {@code baseX + 3},
-     * in Y-Richtung von {@code baseY} bis {@code baseY + 2} und in Z-Richtung
-     * von {@code baseZ} bis {@code baseZ + 1}.
+     * Secures the double chest by surrounding it with barriers.
      *
-     * @param player    Spieler, für den Debug-Ausgaben erfolgen.
-     * @param chestLoc1 Position der ersten Kiste.
-     * @param chestLoc2 Position der zweiten Kiste.
+     * <p>The method fills a fixed 4×3×2 area around the two chest blocks with barriers, excluding
+     * the chest blocks themselves. This area extends 1 block beyond the chests in all directions.
+     * A message is sent to the player once the chest is fully secured.</p>
+     *
+     * @param player    the player for whom the DeadChest is being secured
+     * @param chestLoc1 the location of the first chest block
+     * @param chestLoc2 the location of the second chest block
      */
     public void secureDeadChest(Player player, Location chestLoc1, Location chestLoc2) {
-        // Validierungen
         if (chestLoc1 == null || chestLoc2 == null) {
-            player.sendMessage(ChatColor.RED + "Fehler: Eine der Kisten-Positionen ist null!");
+            //player.sendMessage(ChatColor.RED + "Error: One of the chest locations is null!");
             return;
         }
         World world = chestLoc1.getWorld();
         if (world == null) {
-            player.sendMessage(ChatColor.RED + "Fehler: Welt ist null!");
+           // player.sendMessage(ChatColor.RED + "Error: World is null!");
             return;
         }
 
-        // Koordinaten der beiden Kisten auslesen
         int c1x = chestLoc1.getBlockX();
         int c1y = chestLoc1.getBlockY();
         int c1z = chestLoc1.getBlockZ();
 
-        int c2x = chestLoc2.getBlockX();
-        int c2y = chestLoc2.getBlockY();
-        int c2z = chestLoc2.getBlockZ();
-
-        // Minimal- und Maximalwerte ermitteln
-        int minX = Math.min(c1x, c2x) - 1;  // 1 Block links/kleiner
-        int maxX = Math.max(c1x, c2x) + 1;  // 1 Block rechts/größer
-        int minY = c1y - 1;                 // 1 Block tiefer
-        int maxY = c1y + 1;                 // 1 Block höher
-        int minZ = c1z - 1;                 // 1 Block "vorne"
-        int maxZ = c1z + 1;                 // 1 Block "hinten"
-
-        /*
-         * Jetzt iterieren wir durch diesen Bereich (x = minX..maxX,
-         * y = minY..maxY, z = minZ..maxZ) und setzen überall Barrieren,
-         * außer an den beiden Kistenblöcken selbst.
-         */
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    // Wenn es einer der Kistenblöcke ist: überspringen
-                    if ((x == c1x && y == c1y && z == c1z) ||
-                            (x == c2x && y == c2y && z == c2z)) {
-                        continue;
-                    }
-
-                    Block block = world.getBlockAt(x, y, z);
-                    block.setType(Material.GLASS);
-                }
-            }
-        }
-
-        player.sendMessage(ChatColor.GREEN + "Kiste ohne Hohlraum vollständig umhüllt!");
-    }
-
-    /**
-     * Entfernt alle Barrieren im selben 4×3×2-Bereich, der in
-     * {@link #secureDeadChest(Player, Location, Location)} verwendet wird.
-     * Die Kistenblöcke selbst bleiben erhalten.
-     * <p>
-     * Wird z. B. aufgerufen, wenn der Spieler die DeadChest "kauft" und
-     * somit freien Zugriff auf die Kiste haben soll.
-     *
-     * @param player Spieler, dessen DeadChest-Barrieren entfernt werden sollen.
-     */
-    public void unlockDeadChest(Player player) {
-        // 1) Welt + erste Kistenposition (chestLoc1) aus der Config laden
-        World world = player.getWorld();
-        int c1x = configManager.getDeadChestX(player);
-        int c1y = configManager.getDeadChestY(player);
-        int c1z = configManager.getDeadChestZ(player);
-        Location chestLoc1 = new Location(world, c1x, c1y, c1z);
-
-        // 2) Zweite Kiste = chestLoc1 + 1 in X-Richtung
-        Location chestLoc2 = chestLoc1.clone().add(1, 0, 0);
-
-        // 3) Bounding Box um beide Kisten berechnen: 1 Block größer in alle Richtungen
         int c2x = chestLoc2.getBlockX();
         int c2y = chestLoc2.getBlockY();
         int c2z = chestLoc2.getBlockZ();
@@ -315,19 +227,60 @@ public class DeadChestLogic {
         int minZ = c1z - 1;
         int maxZ = c1z + 1;
 
-        // 4) Alle Barrieren in diesem Bereich entfernen, Kisten selbst überspringen
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
-                    // Überspringe die beiden Kistenblöcke
+                    if ((x == c1x && y == c1y && z == c1z) ||
+                            (x == c2x && y == c2y && z == c2z)) {
+                        continue;
+                    }
+                    Block block = world.getBlockAt(x, y, z);
+                    block.setType(Material.BARRIER);
+                }
+            }
+        }
+
+        //player.sendMessage(ChatColor.GREEN + "Chest fully secured with barriers!");
+    }
+
+    /**
+     * Removes the barriers surrounding the DeadChest, unlocking it for the player.
+     *
+     * <p>This method calculates the same 4×3×2 area used to secure the chest and sets any barrier blocks
+     * found within that area to AIR, leaving the chest blocks intact.</p>
+     *
+     * @param player the player whose DeadChest barriers are to be removed
+     */
+    public void unlockDeadChest(Player player) {
+        World world = player.getWorld();
+        int c1x = configManager.getDeadChestX(player);
+        int c1y = configManager.getDeadChestY(player);
+        int c1z = configManager.getDeadChestZ(player);
+        Location chestLoc1 = new Location(world, c1x, c1y, c1z);
+
+        Location chestLoc2 = chestLoc1.clone().add(1, 0, 0);
+
+        int c2x = chestLoc2.getBlockX();
+        int c2y = chestLoc2.getBlockY();
+        int c2z = chestLoc2.getBlockZ();
+
+        int minX = Math.min(c1x, c2x) - 1;
+        int maxX = Math.max(c1x, c2x) + 1;
+        int minY = c1y - 1;
+        int maxY = c1y + 1;
+        int minZ = c1z - 1;
+        int maxZ = c1z + 1;
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
                     boolean isChest1 = (x == c1x && y == c1y && z == c1z);
                     boolean isChest2 = (x == c2x && y == c2y && z == c2z);
                     if (isChest1 || isChest2) {
                         continue;
                     }
-
                     Block block = world.getBlockAt(x, y, z);
-                    if (block.getType() == Material.GLASS) {
+                    if (block.getType() == Material.BARRIER) {
                         block.setType(Material.AIR);
                     }
                 }
@@ -335,35 +288,35 @@ public class DeadChestLogic {
         }
     }
 
-    // Checks if Player has enough money to buy the Deadchest
-    // is TRUE then it will run unlockDeadChest
+    /**
+     * Processes the purchase to unlock the DeadChest.
+     *
+     * <p>This method checks that the player is near their DeadChest, verifies that a DeadChest exists,
+     * and confirms that the player has sufficient funds. If all checks pass, it deducts the required amount
+     * and unlocks the DeadChest by removing the barriers.</p>
+     *
+     * @param player the player attempting to unlock their DeadChest
+     */
     public void buyDeadchestUnlock(Player player) {
-        // 🔹 1) Ist der Spieler überhaupt in der Nähe der DeadChest?
         if (!isNearDeadChest(player)) {
-            player.sendMessage(ChatColor.RED + "❌ Du bist nicht in der Nähe deiner DeadChest!");
+            player.sendMessage(ChatColor.RED + "❌ You are not near your DeadChest!");
             return;
         }
 
-        // 🔹 2) Existiert überhaupt eine DeadChest für diesen Spieler?
         if (!configManager.isDeadChest(player)) {
-            player.sendMessage(ChatColor.RED + "❌ Es gibt keine DeadChest für dich!");
+            player.sendMessage(ChatColor.RED + "❌ No DeadChest exists for you!");
             return;
         }
 
-        // 🔹 3) Hat der Spieler genug Geld, um die DeadChest zu kaufen?
         long price = configManager.getDeadChestOpenPrice();
         if (!economyManager.canAfford(player, price)) {
-            player.sendMessage(ChatColor.RED + "❌ Du hast nicht genug Geld! (Kosten: $" + price);
+            player.sendMessage(ChatColor.RED + "❌ You do not have enough money! (Cost: $" + price);
             return;
         }
 
-        // 🔹 4) Geld vom Spieler abziehen
         economyManager.takeMoney(player, price);
-        player.sendMessage(ChatColor.GREEN + "✅ Du hast deine DeadChest für $" + price + "freigeschaltet!");
+        player.sendMessage(ChatColor.GREEN + "✅ You have unlocked your DeadChest for $" + price + "!");
 
-        // 🔹 5) DeadChest freischalten (Barrieren entfernen)
         unlockDeadChest(player);
     }
-
-
 }
